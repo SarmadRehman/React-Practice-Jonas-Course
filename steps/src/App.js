@@ -5,14 +5,17 @@ const messages = [
 ];
 
 function App() {
+  const step = 1;
   return (
     <div className="steps">
       <div className="numbers">
-        <div className="active">1</div>
-        <div>2</div>
-        <div>3</div>
+        <div className={`${step >= 1 ? "active" : ""}`}>1</div>
+        <div className={`${step >= 2 ? "active" : ""}`}>2</div>
+        <div className={`${step >= 3 ? "active" : ""}`}>3</div>
       </div>
-      <p className="message">Hello</p>
+      <p className="message">
+        Step {}: {messages[step - 1]}
+      </p>
       <div className="buttons">
         <button style={{ background: "#7920f2", color: "#fff" }}>
           Previous
