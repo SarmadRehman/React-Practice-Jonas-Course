@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "../index.css";
+
 const pizzaData = [
   {
     name: "Focaccia",
@@ -55,6 +56,7 @@ function App() {
     </div>
   );
 }
+
 function Header() {
   return (
     <header className="header">
@@ -62,34 +64,60 @@ function Header() {
     </header>
   );
 }
+
 function Menu() {
   return (
     <main className="menu">
-      <h2>Our menu</h2>
-      <Pizza />
-      <Pizza />
-      <Pizza />
+      <h2>Our Menu</h2>
+      <ul className="pizzas">
+        {pizzaData.map((pizza) => (
+          <Pizza pizzaObj={pizza} key={pizza.name} />
+        ))}
+      </ul>
     </main>
   );
 }
 
+function Pizza({ pizzaObj }) {
+  return (
+    <li className={`pizza ${pizzaObj.soldOut ? "sold-out" : ""}`}>
+      <img src={pizzaObj.photoName} alt={pizzaObj.name} />
+      <div>
+        <h3>{pizzaObj.name}</h3>
+        <p>{pizzaObj.ingredients}</p>
+        <span>{pizzaObj.soldOut ? "SOLD OUT" : pizzaObj.price}</span>
+      </div>
+    </li>
+  );
+}
+
 function Footer() {
+  const hour = new Date().getHours();
+  const openHour = 12;
+  const closeHour = 22;
+  const isOpen = hour >= openHour && hour <= closeHour;
+  console.log(isOpen);
+  console.log(hour);
+
+  if (!isOpen) {
+    <p>CLOSED</p>;
+  }
   return (
     <footer className="footer">
-      {new Date().toLocaleTimeString()}. We are Currently Open
+      {isOpen ? (
+        <div className="order">
+          <p>We are open until {closeHour}:00</p>
+          <button className="btn">Order</button>
+        </div>
+      ) : (
+        <p>
+          We are happy to Welcome you between {openHour}:00 and {closeHour}:00
+        </p>
+      )}
     </footer>
   );
 }
 
-function Pizza() {
-  return (
-    <div>
-      <img src="pizzas/spinaci.jpg" alt="pizza-spinaci" />
-      <h3>Pizza Spinaci</h3>
-      <p>Tomato, mozarella, spinach, and ricotta cheese</p>
-    </div>
-  );
-}
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
