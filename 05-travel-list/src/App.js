@@ -3,9 +3,12 @@ import { useState } from "react";
 export default function App() {
   //Lifting the state UP: state is here as needed by two siblings of this parent
   const [items, setItems] = useState([]);
+  // Instead of the idea used Derived State
+  //const [numItems, setNumItems] = useState(0);
 
   function handleAdditems(item) {
     setItems((items) => [...items, item]);
+    // setNumItems((num) => num + 1);
   }
 
   function handleDeleteItem(id) {
@@ -21,7 +24,7 @@ export default function App() {
   return (
     <div className="app">
       <Logo />
-      {/* from form the item is added */}
+      {/* from the Form where the item is added */}
       <Form onAddItems={handleAdditems} />
       {/* in which the item is shown in UI  */}
       <PackingList
@@ -29,7 +32,7 @@ export default function App() {
         onDeleteItem={handleDeleteItem}
         onToggle={handleToggleItem}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -106,10 +109,24 @@ function Item({ item, onDeleteItem, onToggleItem }) {
     </li>
   );
 }
-function Stats() {
+function Stats({ items }) {
+  if (!items.length)
+    return (
+      <p className="stats">
+        <em>Start Ading Items to Your Packing List 🚀</em>
+      </p>
+    );
+  const numItems = items.length;
+  const numPacked = items.filter((item) => item.packed).length;
+  const percentage = Math.round(numPacked / numItems);
   return (
     <footer className="stats">
-      <em>💼 You have X items in your List, and you already packed X (X%)</em>
+      <em>
+        {percentage === 100
+          ? "You got everything! Ready to go plan ✈"
+          : `💼 You have ${numItems} items in your List, and you already packed
+        ${numPacked}  (${percentage}%)`}
+      </em>
     </footer>
   );
 }
