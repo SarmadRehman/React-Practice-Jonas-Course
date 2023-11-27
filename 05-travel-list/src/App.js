@@ -6,11 +6,18 @@ const initialItems = [
 ];
 
 export default function App() {
+  //Lifting the state UP: state is here as needed by two siblings of this parent
+  const [items, setItems] = useState([]);
+  function handleAdditems(item) {
+    setItems((items) => [...items, item]);
+  }
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      {/* from form the item is added */}
+      <Form onAddItems={handleAdditems} />
+      {/* in which the item is shown in UI  */}
+      <PackingList items={items} />
       <Stats />
     </div>
   );
@@ -19,15 +26,18 @@ export default function App() {
 function Logo() {
   return <h1>🌴 Far Away 👜</h1>;
 }
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState();
   const [quantity, setQuantity] = useState(1);
+
   function handleSubmit(e) {
-    //for the scenario there isn't anything IN description and checks the submission
+    //for the scenario when there isn't anything IN description it checks the submission
     if (!description) return;
     e.preventDefault();
     const newItem = { description, quantity, packed: false, id: Date.now() };
     console.log(newItem);
+    onAddItems(newItem);
+
     setDescription("");
     setQuantity(1);
   }
@@ -54,11 +64,11 @@ function Form() {
     </form>
   );
 }
-function PackingList() {
+function PackingList({ items }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
+        {items.map((item) => (
           <Item item={item} key={item.id} />
         ))}
       </ul>
