@@ -28,6 +28,11 @@ function Button({ children, onClick }) {
     </button>
   );
 }
+//main component
+// Managing-States :
+// 1-for Show/Hide Add-friend Button
+// 2-rendering friend-list on each add-friend
+// 3-highlighting friend-selected when splitting the bill
 
 export default function App() {
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -61,17 +66,19 @@ export default function App() {
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsLits
+        <FriendsList
           friends={friends}
-          onSelection={handleSelection}
+          onSelection={handleSelection} // handling selected friend-highlight
           selectedFriend={selectedFriend}
         />
+        {/* conditionally rendering form-add-friend */}
 
         {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
         <Button onClick={handleShowAddFriend}>
           {showAddFriend ? "Close" : "Add Friend"}
         </Button>
       </div>
+      {/* splitting the bill only when someone is selected for splitting with */}
       {selectedFriend && (
         <FormSplitBill
           selectedFriend={selectedFriend}
@@ -81,8 +88,10 @@ export default function App() {
     </div>
   );
 }
-
-function FriendsLits({ friends, onSelection, selectedFriend }) {
+//list of friends
+//Props : Array of object, selection-function, selected-friend
+//Rendering : the "Friend" with props
+function FriendsList({ friends, onSelection, selectedFriend }) {
   return (
     <ul>
       {friends.map((friend) => (
@@ -96,9 +105,9 @@ function FriendsLits({ friends, onSelection, selectedFriend }) {
     </ul>
   );
 }
-
+//a single "Friend" component of the friendList
 function Friend({ friend, onSelection, selectedFriend }) {
-  const isSelected = selectedFriend?.id === friend.id;
+  const isSelected = selectedFriend?.id === friend.id; //each mapped friend comparing with the selected ones
   return (
     <li className={isSelected ? "selected" : ""}>
       <img src={friend.image} alt={friend.name} />
@@ -120,7 +129,8 @@ function Friend({ friend, onSelection, selectedFriend }) {
     </li>
   );
 }
-
+//form for adding an new object in friendlist array of objects
+//States : friend-name , friend-image(url),
 function FormAddFriend({ onAddFriend }) {
   const [name, setName] = useState("");
   const [image, setImage] = useState("https://i.pravatar.cc/48");
@@ -146,7 +156,7 @@ function FormAddFriend({ onAddFriend }) {
 
   return (
     <form className="form-add-friend" onSubmit={handleSubmit}>
-      <label>👫 Friend name</label>
+      <label>👫Friend name</label>
       <input
         type="text"
         value={name}
@@ -164,7 +174,8 @@ function FormAddFriend({ onAddFriend }) {
     </form>
   );
 }
-
+//Form for suplitting the bill
+//States: controlled-states: bill, paid by whom you are the selected one, who is paying the bill
 function FormSplitBill({ selectedFriend, onSplitBill }) {
   const [bill, setBill] = useState("");
   const [paidByUser, setPaidByUser] = useState("");
@@ -173,7 +184,7 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-
+    // if friend is paying then the bill is going to his balance
     if (!bill || !paidByUser) return;
     onSplitBill(whoIsPaying === "user" ? paidByFriend : -paidByFriend);
   }
@@ -188,7 +199,7 @@ function FormSplitBill({ selectedFriend, onSplitBill }) {
         onChange={(e) => setBill(Number(e.target.value))}
       />
 
-      <label>🧍‍♀️ Your expense</label>
+      <label>🧍‍♀️Your expense</label>
       <input
         type="text"
         value={paidByUser}
