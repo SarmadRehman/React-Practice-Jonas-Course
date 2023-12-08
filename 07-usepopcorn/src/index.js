@@ -9,6 +9,7 @@ root.render(
     {/* <App /> */}
     <StarRating maxRating={5} />
     <StarRating
+      maxRating={5}
       size={25}
       color="pink"
       className="test"
