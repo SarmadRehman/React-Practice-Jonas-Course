@@ -48,21 +48,34 @@ const tempWatchedData = [
 ];
 
 const KEY = "57f2bc2c";
-const query = "interstellar";
+const query = "adadafww";
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [error, setError] = useState("");
   useEffect(function () {
     async function fetchMovies() {
-      setIsLoading(true);
-      const res = await fetch(
-        `http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
-      );
-      const data = await res.json();
-      setMovies(data.Search);
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
+        );
+        if (!res.ok) {
+          throw new Error("something went wrong in fetching movies");
+        }
+
+        const data = await res.json();
+        if (data.Response === "False") throw new Error("Movie not found");
+
+        setMovies(data.Search);
+        console.log(data);
+      } catch (err) {
+        console.error(err.message);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchMovies();
   }, []);
@@ -74,7 +87,13 @@ export default function App() {
         <NumResults movies={movies} />
       </Navbar>
       <Main movies={movies}>
-        <Box>{isLoading ? <Loader /> : <MoviesList movies={movies} />}</Box>
+        <Box>
+          {/* {isLoading ? <Loader /> : <MoviesList movies={movies} />} */}
+          {/* ADDRESSING THREE MUTUALLY EXCLUSIVE CONDITIONS  */}
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MoviesList movies={movies} />}
+          {error && <ErrorMessage message={error} />}
+        </Box>
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMovieList watched={watched} />
@@ -83,6 +102,14 @@ export default function App() {
         {/* <WatchedBox /> */}
       </Main>
     </>
+  );
+}
+// FOR ANY ERROR OCCUR ON LOADING
+function ErrorMessage({ message }) {
+  return (
+    <p className="error">
+      <span>🎃</span> {message}
+    </p>
   );
 }
 function Loader() {
