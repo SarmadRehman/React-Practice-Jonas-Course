@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import StarRating from "./StarRating";
+//starting array of objects
 const tempMovieData = [
   {
     imdbID: "tt1375666",
@@ -46,9 +47,9 @@ const tempWatchedData = [
     userRating: 9,
   },
 ];
-
+//key for loging in the imdb-database
 const KEY = "57f2bc2c";
-
+//main App
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
@@ -74,37 +75,48 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
+
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
+
           const res = await fetch(
-            `http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
-          if (!res.ok) {
-            throw new Error("something went wrong in fetching movies");
-          }
+
+          if (!res.ok)
+            throw new Error("Something went wrong with fetching movies");
 
           const data = await res.json();
           if (data.Response === "False") throw new Error("Movie not found");
 
           setMovies(data.Search);
-          console.log(data.Search);
+          setError("");
         } catch (err) {
-          console.error(err.message);
-          setError(err.message);
+          if (err.name !== "AbortError") {
+            console.log(err.message);
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
       }
-      // when query length is less than 3
+
       if (query.length < 3) {
         setMovies([]);
         setError("");
         return;
       }
 
+      handleCloseMovie();
       fetchMovies();
+
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
@@ -301,10 +313,18 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
     getMovieDetails();
   }, [selectedId]);
-
+  //Loader for the case when there isn't any movie loaded to show
   if (Object.keys(movie).length === 0) {
     return <Loader />;
   }
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+    },
+    [title]
+  );
 
   function handleAdd() {
     const newWatchedMovie = {
