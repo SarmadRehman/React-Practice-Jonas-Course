@@ -292,11 +292,13 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       );
       const data = await res.json();
       setMovie(data);
+      console.log(data);
       setIsLoading(false);
     }
 
     if (selectedId) {
       getMovieDetails();
+
       setIsWatched(watched.map((movie) => movie.imdbID).includes(selectedId));
       setWatchedUserRating(
         watched.find((movie) => movie.imdbID === selectedId)?.userRating
@@ -313,15 +315,16 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
-      title: movie.Title,
-      year: movie.Year,
-      poster: movie.Poster,
-      imdbRating: Number(movie.imdbRating),
+      Title: movie.Title,
+      Year: movie.Year,
+      Poster: movie.Poster,
       runtime: Number(movie.Runtime.split(" ")[0]),
+      imdbRating: Number(movie.imdbRating),
       userRating,
     };
     onAddWatched(newWatchedMovie);
     onCloseMovie();
+    console.log(movie.Poster);
   }
 
   useEffect(() => {
