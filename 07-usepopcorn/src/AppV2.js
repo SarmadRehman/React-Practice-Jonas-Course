@@ -121,21 +121,13 @@ function Logo() {
 
 function Search({ query, setQuery }) {
   const InputEl = useRef(null);
-  useEffect(
-    function () {
-      function callback(e) {
-        if (document.activeElement === InputEl.current) return;
 
-        if (e.code === "Enter") {
-          InputEl.current.focus();
-          setQuery("");
-        }
-      }
-      document.addEventListener("keydown", callback);
-      return () => document.addEventListener("keydown", callback);
-    },
-    [setQuery]
-  );
+  useKey("Enter", function () {
+    if (document.activeElement === InputEl.current) return;
+    InputEl.current.focus();
+    setQuery("");
+  });
+
   return (
     <input
       className="search"
