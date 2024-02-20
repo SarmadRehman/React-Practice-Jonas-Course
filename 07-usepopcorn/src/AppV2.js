@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
@@ -11,15 +12,17 @@ export default function App() {
   const [query, setQuery] = useState("");
   const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
   const [selectedId, setSelectedId] = useState(null);
-  const [watched, setWatched] = useState(() => {
-    try {
-      const storedData = localStorage.getItem("watched");
-      return storedData ? JSON.parse(storedData) : []; // Initialize as empty array if no data found
-    } catch (error) {
-      console.error("Error parsing watched data from local storage:", error);
-      return []; // Initialize as empty array if parsing fails
-    }
-  });
+  const [watched, setWatched] = useLocalStorageState([], "watched");
+
+  // const [watched, setWatched] = useState(() => {
+  //   try {
+  //     const storedData = localStorage.getItem("watched");
+  //     return storedData ? JSON.parse(storedData) : []; // Initialize as empty array if no data found
+  //   } catch (error) {
+  //     console.error("Error parsing watched data from local storage:", error);
+  //     return []; // Initialize as empty array if parsing fails
+  //   }
+  // });
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -38,12 +41,12 @@ export default function App() {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
 
-  useEffect(
-    function () {
-      localStorage.setItem("watched", JSON.stringify(watched));
-    },
-    [watched]
-  );
+  // useEffect(
+  //   function () {
+  //     localStorage.setItem("watched", JSON.stringify(watched));
+  //   },
+  //   [watched]
+  // );
 
   return (
     <>
